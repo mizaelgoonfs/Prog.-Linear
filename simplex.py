@@ -38,24 +38,50 @@ def entra_base(vetor):
     if not (valor_min >= 0):
         return vetor.index(valor_min)
     else:
-        return False
+        return -1
 
-#def ler_arquivo(nome_arquivo):
-arquivo = open('PPL.txt', 'r')
-leitura = arquivo.readlines()
-#linhas = leitura.split('\n')
-print(leitura)
+def variaveis_basicas(matrizNova):
+    var_basicas = []
+    for x in range(len(matrizNova[0]) - 1):
+        forma_canonica = []
+        soma_canonica = 0
+        for y in range(len(matrizNova)):
+            if ((matrizNova[y][x] != 0) and (matrizNova[y][x] != 1)):
+                soma_canonica += 1
+            forma_canonica.append(matrizNova[y][x])
+
+        if ((forma_canonica.count(1) == 1) and (soma_canonica == 0)):
+            var_basicas.append(x)
+
+    return var_basicas
+
+def print_tablo(matriz, fobjetivo, var_basicas):
+    print("\nEssa é a matriz:")
+    text = '| '
+    for i in range(len(matriz[0]) - 1):
+        text += 'X{} | '.format(i + 1)
+
+    print(text, 'b ')
+    for i in range(len(matriz)):
+        print('{}'.format(matriz[i]))
+
+    print("Essa é a função objetivo a ser minimizada:")
+    print(fobjetivo, "\n")
+
+    print('Variáveis básicas: ')
+    for i in range(len(var_basicas)):
+        print('| X{} |'.format(var_basicas[i] + 1))
+
+
+entrada = open('PPL2.txt', 'r').readlines()
 matrizNova = []
-for x in leitura:
-    linhas_separadas = x.split(', ')
-    linha = []
-    for y in linhas_separadas:
-        valor = y.split(', ')
-        num = int(valor[0])
-        linha.append(num)
-    matrizNova.append(linha)
+for line in entrada:
+    linhas = []
+    for i in line.split(' '):
+        num = round(float(i), 2)
+        linhas.append(num)
+    matrizNova.append(linhas)
 
-print(matrizNova)
 matriz = matrizNova[1:]
 fobjetivo = matrizNova[0]
 
@@ -64,31 +90,19 @@ for i in range(len(matriz)):  # loucura
     if (max(matriz[i], key=int) > A):
         A = max(matriz[i], key=int)
 
-print("Essa é a matriz:")
-for i in range(len(matriz)):
-    print(matriz[i])
-
-print("Essa é a função objetivo a ser minimizada:")
-print(fobjetivo, "\n")
-
-#ler_arquivo('PPL.txt')
-
-
-#matriz = [[1, 2, -1, 0, 0, 1, 9], [1, 0, 0, 1, 0, 0, 3], [0, 1, 0, 0, 1, 0, 4]]
-#fobjetivo = [-1, -2, 1, 0, 0, 0, -9]
+var_basicas = variaveis_basicas(matrizNova)
+print_tablo(matriz, fobjetivo, var_basicas)
 
 question = 's'
 ''' aplicando o simplex (+ou-) '''
 while (question != 'f'):
     coluna_entra_base = entra_base(fobjetivo)
-    if entra_base == False:
+    if coluna_entra_base == -1:
         break
 
     troca_de_base(matriz, teste(matriz, coluna_entra_base, A), coluna_entra_base, fobjetivo)
 
-    for i in range(len(matriz)):
-        print(matriz[i])
-
-    print("\n", fobjetivo)
+    var_basicas = variaveis_basicas(matriz)
+    print_tablo(matriz, fobjetivo, var_basicas)
 
     question = input("continuar: 's', parar: 'f'.\n")
